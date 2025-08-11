@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Document</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --primary: #6C63FF;
+      --primary-dark: #564FD1;
+      --light: #F7FAFC;
+      --dark: #2D3748;
+      --gray: #A0AEC0;
+      --white: #FFFFFF;
+      --danger: #FF6584;
+      --success: #42E2B8;
+      --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.12);
+      --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
+      --radius: 8px;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: var(--light);
+      color: var(--dark);
+      line-height: 1.6;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      background: var(--white);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-md);
+      padding: 30px;
+      position: relative;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+
+    .nav-link {
+      color: var(--primary);
+      text-decoration: none;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      transition: all 0.3s ease;
+    }
+
+    .nav-link:hover {
+      color: var(--primary-dark);
+    }
+
+    .nav-link i {
+      font-size: 0.9em;
+    }
+
+    h2 {
+      color: var(--primary);
+      margin-bottom: 25px;
+      text-align: center;
+      font-size: 28px;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 500;
+    }
+
+    input[type="text"],
+    input[type="number"],
+    select,
+    textarea {
+      width: 100%;
+      padding: 12px 15px;
+      border: 1px solid var(--gray);
+      border-radius: var(--radius);
+      font-family: inherit;
+      font-size: 16px;
+      transition: all 0.3s ease;
+    }
+
+    input[type="text"]:focus,
+    input[type="number"]:focus,
+    select:focus,
+    textarea:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(108, 99, 255, 0.2);
+    }
+
+    textarea {
+      min-height: 100px;
+      resize: vertical;
+    }
+
+    .radio-group {
+      display: flex;
+      gap: 20px;
+      margin-top: 10px;
+    }
+
+    .radio-option {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .radio-option input[type="radio"] {
+      accent-color: var(--primary);
+      width: 18px;
+      height: 18px;
+    }
+
+    button[type="button"] {
+      background-color: var(--primary);
+      color: white;
+      border: none;
+      padding: 14px 25px;
+      border-radius: var(--radius);
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      width: 100%;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+
+    button[type="button"]:hover {
+      background-color: var(--primary-dark);
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-sm);
+    }
+
+    button[type="button"]:active {
+      transform: translateY(0);
+    }
+
+    #msg {
+      margin-top: 20px;
+      text-align: center;
+      font-weight: 500;
+      padding: 10px;
+      border-radius: var(--radius);
+    }
+
+    .error {
+      color: var(--danger);
+      background-color: rgba(255, 101, 132, 0.1);
+    }
+
+    .success {
+      color: var(--success);
+      background-color: rgba(66, 226, 184, 0.1);
+    }
+
+    .loading {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(255, 255, 255, 0.8);
+      z-index: 1000;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .loading.active {
+      display: flex;
+    }
+
+    .spinner {
+      width: 50px;
+      height: 50px;
+      border: 5px solid rgba(108, 99, 255, 0.2);
+      border-radius: 50%;
+      border-top-color: var(--primary);
+      animation: spin 1s ease-in-out infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    @media (max-width: 600px) {
+      .container {
+        padding: 20px;
+      }
+      
+      h2 {
+        font-size: 24px;
+      }
+      
+      .radio-group {
+        flex-direction: column;
+        gap: 10px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="loading" id="loading">
+    <div class="spinner"></div>
+  </div>
+
+  <div class="container">
+    <div class="nav-links">
+      <a href="index.html" class="nav-link">
+        <i class="fas fa-arrow-left"></i> GO Back
+      </a>
+      <a href="check.html" class="nav-link">
+        <i class="fas fa-check-circle"></i> Check Status
+      </a>
+    </div>
+
+    <h2>Student Registration Form</h2>
+
+    <form id="form">
+      <div class="form-group">
+        <label for="name">Full Name</label>
+        <input id="name" type="text" placeholder="Enter your full name" required>
+      </div>
+
+      <div class="form-group">
+        <label for="father">Father's Name</label>
+        <input id="father" type="text" placeholder="Enter your father's name" required>
+      </div>
+
+      <div class="form-group">
+        <label for="phone">Phone Number</label>
+        <input id="phone" type="number" placeholder="Enter your phone number" required>
+      </div>
+
+      <div class="form-group">
+        <label for="roll">Roll Number</label>
+        <input id="roll" type="number" placeholder="Enter your roll number" required>
+      </div>
+
+      <div class="form-group">
+        <label>Gender</label>
+        <div class="radio-group">
+          <label class="radio-option">
+            <input type="radio" name="gender" value="Male" required> Male
+          </label>
+          <label class="radio-option">
+            <input type="radio" name="gender" value="Female"> Female
+          </label>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="course">Course</label>
+        <select id="course" required>
+          <option value="">-- Select Course --</option>
+          <option value="Web Development">Web Development</option>
+          <option value="Graphic Design">Graphic Design</option>
+          <option value="Digital Marketing">Digital Marketing</option>
+          <option value="Data Science">Data Science</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="qualification">Last Qualification</label>
+        <select id="qualification" required>
+          <option value="">-- Select Qualification --</option>
+          <option value="High School">High School</option>
+          <option value="Bachelor's Degree">Bachelor's Degree</option>
+          <option value="Master's Degree">Master's Degree</option>
+          <option value="PhD">PhD</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="branch">Jamia Branch</label>
+        <select id="branch" required>
+          <option value="">-- Select Branch -- </option>
+          <option value="Kanzul Eman">Kanzul Eman</option>
+          <option value="Sharah-e-faisal">Sharah-e-faisal</option>
+          <option value="lyari town">lyari town</option>
+          <option value="korangi">korangi</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="address">Address</label>
+        <textarea id="address" placeholder="Enter your complete address" required></textarea>
+      </div>
+
+    
+      <div class="form-group">
+        <label for="profile-image">Profile Image</label>
+        <input type="file" id="profile-image" accept="image/*" required />
+      </div>
+
+      <button type="button" onclick="submitData()">
+        <i class="fas fa-paper-plane"></i> Submit
+      </button>
+    </form>
+
+    <p id="msg"></p>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    const supabaseUrl = 'https://xzypzkjqjcabioedvmzr.supabase.co';
+    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh6eXB6a2pxamNhYmlvZWR2bXpyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTMxOTYzOTcsImV4cCI6MjA2ODc3MjM5N30.5Ic571hDQ8iYDfnKg9WCxLTX7VUoLwXxQ967PrRYYW4';
+    const client = supabase.createClient(supabaseUrl, supabaseKey);
+
+   async function submitData() {
+  const loading = document.getElementById('loading');
+  const name = document.getElementById('name').value.trim();
+  const father = document.getElementById('father').value.trim();
+  const phone = document.getElementById('phone').value.trim();
+  const roll = document.getElementById('roll').value.trim();
+  const gender = document.querySelector('input[name="gender"]:checked')?.value;
+  const course = document.getElementById('course').value;
+  const qualification = document.getElementById('qualification').value;
+const branch = document.getElementById('branch').value;
+  const address = document.getElementById('address').value.trim();
+  const profileImage = document.getElementById('profile-image').files[0];
+  const msg = document.getElementById('msg');
+
+  if (!name || !father || !phone || !roll || !gender || !course || !address || !profileImage) {
+    msg.textContent = 'Please fill all fields and upload a profile image.';
+    msg.className = 'error';
+    return;
+  }
+
+  loading.classList.add('active');
+
+  try {
+
+    const fileName = `profile/${Date.now()}_${profileImage.name}`;
+    const { data: fileData, error: fileError } = await client
+      .storage
+      .from('profile-pics')
+      .upload(fileName, profileImage);
+
+    if (fileError) {
+      console.error("File Upload Error:", fileError);
+      msg.textContent = `Error uploading image: ${fileError.message}`;
+      msg.className = 'error';
+      loading.classList.remove('active');
+      return;
+    }
+
+
+    const { data: publicData } = client
+      .storage
+      .from('profile-pics')
+      .getPublicUrl(fileData.path);
+
+    const publicUrl = publicData.publicUrl;
+
+    const insertData = {
+      name,
+      father_name: father,
+      phone,
+      roll_number: roll,
+      gender,
+      course,
+      address,
+      branch,
+      qualification,
+      profile_image: publicUrl,
+      status: "pending"
+    };
+
+    const { error: insertError } = await client
+      .from('students')
+      .insert([insertData]);
+
+    if (insertError) {
+      console.error("Insert Error:", insertError);
+      msg.textContent = insertError.message;
+      msg.className = 'error';
+    } else {
+      msg.textContent = 'Registration successful! Redirecting...';
+      setTimeout(() => {
+        window.location.href = "thanks.html";
+      }, 2000);
+    }
+
+  } catch (err) {
+    console.error("Unexpected Error:", err);
+    msg.textContent = 'An unexpected error occurred. Please try again.';
+    msg.className = 'error';
+  } finally {
+    loading.classList.remove('active');
+  }
+}
+
+
+
+  </script>
+</body>
+</html>
