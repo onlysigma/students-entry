@@ -214,7 +214,17 @@
       h2 {
         font-size: 24px;
       }
-      
+      input.invalid {
+  border-color: var(--danger);
+  box-shadow: 0 0 0 3px rgba(255, 101, 132, 0.2);
+}
+
+.error-message {
+  color: var(--danger);
+  font-size: 14px;
+  margin-top: 5px;
+  display: block;
+}
       .radio-group {
         flex-direction: column;
         gap: 10px;
@@ -250,11 +260,11 @@
         <input id="father" type="text" placeholder="Enter your father's name" required>
       </div>
 
-      <div class="form-group">
-        <label for="phone">Phone Number</label>
-        <input id="phone" type="number" placeholder="Enter your phone number" required>
-      </div>
-
+<div class="form-group">
+  <label for="phone">Phone Number</label>
+  <input id="phone" type="text" placeholder="Enter your phone number" required>
+  <span id="phone-error" class="error-message"></span>
+</div>
       <div class="form-group">
         <label for="roll">Roll Number</label>
         <input id="roll" type="number" placeholder="Enter your roll number" required>
@@ -282,6 +292,8 @@
           <option value="Data Science">Data Science</option>
         </select>
       </div>
+      <div class="form-group" id="course-details" style="display: none;"></div>
+
 
       <div class="form-group">
         <label for="qualification">Last Qualification</label>
@@ -324,97 +336,213 @@
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script>
-    const supabaseUrl = 'https://xzypzkjqjcabioedvmzr.supabase.co';
-    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh6eXB6a2pxamNhYmlvZWR2bXpyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTMxOTYzOTcsImV4cCI6MjA2ODc3MjM5N30.5Ic571hDQ8iYDfnKg9WCxLTX7VUoLwXxQ967PrRYYW4';
-    const client = supabase.createClient(supabaseUrl, supabaseKey);
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+  const supabaseUrl = 'https://xzypzkjqjcabioedvmzr.supabase.co';
+  const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh6eXB6a2pxamNhYmlvZWR2bXpyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTMxOTYzOTcsImV4cCI6MjA2ODc3MjM5N30.5Ic571hDQ8iYDfnKg9WCxLTX7VUoLwXxQ967PrRYYW4';
+  const client = supabase.createClient(supabaseUrl, supabaseKey);
 
-   async function submitData() {
-  const loading = document.getElementById('loading');
-  const name = document.getElementById('name').value.trim();
-  const father = document.getElementById('father').value.trim();
-  const phone = document.getElementById('phone').value.trim();
-  const roll = document.getElementById('roll').value.trim();
-  const gender = document.querySelector('input[name="gender"]:checked')?.value;
-  const course = document.getElementById('course').value;
-  const qualification = document.getElementById('qualification').value;
-const branch = document.getElementById('branch').value;
-  const address = document.getElementById('address').value.trim();
-  const profileImage = document.getElementById('profile-image').files[0];
-  const msg = document.getElementById('msg');
-
-  if (!name || !father || !phone || !roll || !gender || !course || !address || !profileImage) {
-    msg.textContent = 'Please fill all fields and upload a profile image.';
-    msg.className = 'error';
-    return;
+  function capitalizeWords(value) {
+    return value.replace(/\b\w/g, (char) => char.toUpperCase());
   }
 
-  loading.classList.add('active');
+  document.getElementById('name').addEventListener('input', function () {
+    this.value = capitalizeWords(this.value);
+  });
 
-  try {
+  document.getElementById('father').addEventListener('input', function () {
+    this.value = capitalizeWords(this.value);
+  });
 
-    const fileName = `profile/${Date.now()}_${profileImage.name}`;
-    const { data: fileData, error: fileError } = await client
-      .storage
-      .from('profile-pics')
-      .upload(fileName, profileImage);
+  const phoneInput = document.getElementById('phone');
+  const phoneError = document.getElementById('phone-error');
 
-    if (fileError) {
-      console.error("File Upload Error:", fileError);
-      msg.textContent = `Error uploading image: ${fileError.message}`;
-      msg.className = 'error';
-      loading.classList.remove('active');
+  phoneInput.addEventListener('input', function () {
+    const cleaned = this.value.replace(/\D/g, '');
+    this.value = cleaned;
+    validatePhone();
+  });
+
+  function isValidPakistaniPhone(number) {
+    const pakPhoneRegex = /^03[0-9]{9}$/;
+    return pakPhoneRegex.test(number);
+  }
+
+  function validatePhone() {
+    const phone = phoneInput.value.trim();
+    if (!isValidPakistaniPhone(phone)) {
+      phoneInput.classList.add('invalid');
+      phoneError.textContent = 'Number only Pakistani allowed';
+      return false;
+    } else {
+      phoneInput.classList.remove('invalid');
+      phoneError.textContent = '';
+      return true;
+    }
+  }
+
+  async function submitData() {
+    const loading = document.getElementById('loading');
+    const name = document.getElementById('name').value.trim();
+    const father = document.getElementById('father').value.trim();
+    const phone = phoneInput.value.trim();
+    const roll = document.getElementById('roll').value.trim();
+    const gender = document.querySelector('input[name="gender"]:checked')?.value;
+    const course = document.getElementById('course').value;
+    const qualification = document.getElementById('qualification').value;
+    const branch = document.getElementById('branch').value;
+    const address = document.getElementById('address').value.trim();
+    const profileImage = document.getElementById('profile-image').files[0];
+    const msg = document.getElementById('msg');
+
+    msg.textContent = '';
+    msg.className = '';
+
+    if (!validatePhone()) {
       return;
     }
 
-
-    const { data: publicData } = client
-      .storage
-      .from('profile-pics')
-      .getPublicUrl(fileData.path);
-
-    const publicUrl = publicData.publicUrl;
-
-    const insertData = {
-      name,
-      father_name: father,
-      phone,
-      roll_number: roll,
-      gender,
-      course,
-      address,
-      branch,
-      qualification,
-      profile_image: publicUrl,
-      status: "pending"
-    };
-
-    const { error: insertError } = await client
-      .from('students')
-      .insert([insertData]);
-
-    if (insertError) {
-      console.error("Insert Error:", insertError);
-      msg.textContent = insertError.message;
+    if (!name || !father || !phone || !roll || !gender || !course || !qualification || !branch || !address || !profileImage) {
+      msg.textContent = 'Please fill all fields and upload a profile image.';
       msg.className = 'error';
-    } else {
-      msg.textContent = 'Registration successful! Redirecting...';
-      setTimeout(() => {
-        window.location.href = "thanks.html";
-      }, 2000);
+      return;
     }
 
-  } catch (err) {
-    console.error("Unexpected Error:", err);
-    msg.textContent = 'An unexpected error occurred. Please try again.';
-    msg.className = 'error';
-  } finally {
-    loading.classList.remove('active');
+    // Get selected extra course detail from dynamic radio buttons
+    let extraCourseDetail = null;
+    const radioGroups = ['web-tech', 'design-type', 'marketing-type', 'data-type'];
+    for (const group of radioGroups) {
+      const selected = document.querySelector(`input[name="${group}"]:checked`);
+      if (selected) {
+        extraCourseDetail = selected.value;
+        break;
+      }
+    }
+
+    if (document.getElementById('course-details').style.display === 'block' && !extraCourseDetail) {
+      msg.textContent = 'Please select an option related to your course.';
+      msg.className = 'error';
+      return;
+    }
+
+    loading.classList.add('active');
+
+    try {
+      const fileName = `profile/${Date.now()}_${profileImage.name}`;
+      const { data: fileData, error: fileError } = await client
+        .storage
+        .from('profile-pics')
+        .upload(fileName, profileImage);
+
+      if (fileError) {
+        msg.textContent = `Error uploading image: ${fileError.message}`;
+        msg.className = 'error';
+        loading.classList.remove('active');
+        return;
+      }
+
+      const { data: publicData } = client
+        .storage
+        .from('profile-pics')
+        .getPublicUrl(fileData.path);
+
+      const publicUrl = publicData.publicUrl;
+
+      const insertData = {
+        name,
+        father_name: father,
+        phone,
+        roll_number: roll,
+        gender,
+        course,
+        qualification,
+        branch,
+        address,
+        profile_image: publicUrl,
+        status: "pending",
+        course_detail: extraCourseDetail
+      };
+
+      const { error: insertError } = await client
+        .from('students')
+        .insert([insertData]);
+
+      if (insertError) {
+        msg.textContent = insertError.message;
+        msg.className = 'error';
+      } else {
+        msg.textContent = 'Registration successful! Redirecting...';
+        msg.className = 'success';
+        setTimeout(() => {
+          window.location.href = "thanks.html";
+        }, 2000);
+      }
+
+    } catch (err) {
+      msg.textContent = 'An unexpected error occurred. Please try again.';
+      msg.className = 'error';
+    } finally {
+      loading.classList.remove('active');
+    }
   }
-}
 
+  const courseSelect = document.getElementById('course');
+  const courseDetails = document.getElementById('course-details');
 
+  courseSelect.addEventListener('change', function () {
+    const selectedCourse = this.value;
+    courseDetails.innerHTML = '';
+    courseDetails.style.display = 'none';
 
-  </script>
+    if (selectedCourse === 'Web Development') {
+      courseDetails.innerHTML = `
+        <label>Which Web Tech are you interested in?</label>
+        <div class="radio-group">
+          <label class="radio-option"><input type="radio" name="web-tech" value="Frontend"> Frontend</label>
+          <label class="radio-option"><input type="radio" name="web-tech" value="Backend"> Backend</label>
+          <label class="radio-option"><input type="radio" name="web-tech" value="Full Stack"> Full Stack</label>
+        </div>
+      `;
+      courseDetails.style.display = 'block';
+    }
+
+    if (selectedCourse === 'Graphic Design') {
+      courseDetails.innerHTML = `
+        <label>What type of design are you interested in?</label>
+        <div class="radio-group">
+          <label class="radio-option"><input type="radio" name="design-type" value="UI/UX"> UI/UX</label>
+          <label class="radio-option"><input type="radio" name="design-type" value="Print Design"> Print Design</label>
+          <label class="radio-option"><input type="radio" name="design-type" value="Branding"> Branding</label>
+        </div>
+      `;
+      courseDetails.style.display = 'block';
+    }
+
+    if (selectedCourse === 'Digital Marketing') {
+      courseDetails.innerHTML = `
+        <label>What area of marketing interests you?</label>
+        <div class="radio-group">
+          <label class="radio-option"><input type="radio" name="marketing-type" value="SEO"> SEO</label>
+          <label class="radio-option"><input type="radio" name="marketing-type" value="Social Media"> Social Media</label>
+          <label class="radio-option"><input type="radio" name="marketing-type" value="Email Marketing"> Email Marketing</label>
+        </div>
+      `;
+      courseDetails.style.display = 'block';
+    }
+
+    if (selectedCourse === 'Data Science') {
+      courseDetails.innerHTML = `
+        <label>Which field in Data Science?</label>
+        <div class="radio-group">
+          <label class="radio-option"><input type="radio" name="data-type" value="Machine Learning"> Machine Learning</label>
+          <label class="radio-option"><input type="radio" name="data-type" value="Data Analysis"> Data Analysis</label>
+          <label class="radio-option"><input type="radio" name="data-type" value="AI & ML"> AI & ML</label>
+        </div>
+      `;
+      courseDetails.style.display = 'block';
+    }
+  });
+</script>
+
 </body>
 </html>
